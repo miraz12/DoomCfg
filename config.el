@@ -42,7 +42,7 @@
 ;; Evaluate sym links
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory (file-truename "~/org"))
+(setq org-directory (file-truename "~/Nextcloud/notes"))
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -77,7 +77,7 @@
 ;; they are implemented.
 
 ;; Org-roam
-(setq org-roam-directory (file-truename "~/org/roam"))
+(setq org-roam-directory (file-truename "~/Nextcloud/notes/roam"))
 ;; (org-roam-db-autosync-mode)
 (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
@@ -110,25 +110,6 @@
       mu4e-index-lazy-check t
       ;; more sensible date format
       mu4e-headers-date-format "%d.%m.%y")
-
-(setq org-hugo-section "post")
-(setq org-hugo-base-dir "~/sites/org-roam/")
-
-(setq org-publish-project-alist
-      '(
-        ("org-notes"
-         :base-directory "~/org/roam"
-         :base-extension "org"
-         :publishing-directory "~/public_hugo/"
-         :recursive t
-         :publishing-function org-hugo-export-to-md
-         :headline-levels 4             ; Just the default for this project.
-         :auto-preamble t
-         )
-        ))
-(defun shr-render-current-buffer ()
-  (shr-render-region (point-min) (point-max)))
-(setq mu4e-html2text-command 'shr-render-current-buffer)
 
 (defun my-open-calendar ()
   (interactive)
