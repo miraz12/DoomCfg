@@ -85,42 +85,36 @@
                (direction . right)
                (window-width . 0.33)
                (window-height . fit-window-to-buffer)))
-
 (set-email-account!
- "gmail"
- '((mu4e-sent-folder       . "/[Gmail]/Sent Mail")
-   (mu4e-trash-folder      . "/[Gmail]/Bin")
-   (mu4e-refile-folder      . "/[Gmail]/Inbox")
-   (smtpmail-smtp-user     . "pluppe12@gmail.com"))
- t)
-(set-email-account!
- "gmail"
- '((mu4e-sent-folder       . "/[Hotmail]/Sent Mail")
-   (mu4e-trash-folder      . "/[Hotmail]/Bin")
+ "hotmail"
+ '((mu4e-sent-folder       . "/[Hotmail]/Sent")
+   (mu4e-trash-folder      . "/[Hotmail]/Junk")
    (mu4e-refile-folder      . "/[Hotmail]/Inbox")
+   (mu4e-drafts-folder      . "/[Hotmail]/Drafts")
    (smtpmail-smtp-user     . "anton_christoffersson@hotmail.com"))
  t)
-(setq mu4e-get-mail-command "mbsync -c ~/.config/mu4e/mbsyncrc gmail hotmail"
-      ;; get emails and index every 5 minutes
-      mu4e-update-interval 300
-      ;; send emails with format=flowed
-      mu4e-compose-format-flowed t
-      ;; no need to run cleanup after indexing for gmail
-      mu4e-index-cleanup nil
-      mu4e-index-lazy-check t
-      ;; more sensible date format
-      mu4e-headers-date-format "%d.%m.%y")
 
-(defun my-open-calendar ()
-  (interactive)
-  (cfw:open-calendar-buffer
-   :contents-sources
-   (list
-    (cfw:org-create-source "Green")  ; org-agenda source
-    ;; (cfw:cal-create-source "Orange") ; diary source
-    (cfw:ical-create-source "JessicaAnton" "~/.dotfiles/jessicaanton-2022-10-20.ics" "Purple")  ; ICS source1
-    (cfw:ical-create-source "Anton" "~/.dotfiles/anton-christoffersson-1-2022-10-20.ics" "Blue")  ; ICS source1
-    )))
+;; (setq mu4e-get-mail-command "mbsync -c ~/.config/mu4e/mbsyncrc gmail hotmail"
+;;       ;; get emails and index every 5 minutes
+;;       mu4e-update-interval 300
+;;       ;; send emails with format=flowed
+;;       mu4e-compose-format-flowed t
+;;       ;; no need to run cleanup after indexing for gmail
+;;       mu4e-index-cleanup nil
+;;       mu4e-index-lazy-check t
+;;       ;; more sensible date format
+;;       mu4e-headers-date-format "%d.%m.%y")
+
+;; (defun my-open-calendar ()
+;;   (interactive)
+;;   (cfw:open-calendar-buffer
+;;    :contents-sources
+;;    (list
+;;     (cfw:org-create-source "Green")  ; org-agenda source
+;;     ;; (cfw:cal-create-source "Orange") ; diary source
+;;     (cfw:ical-create-source "JessicaAnton" "~/.dotfiles/jessicaanton-2022-10-20.ics" "Purple")  ; ICS source1
+;;     (cfw:ical-create-source "Anton" "~/.dotfiles/anton-christoffersson-1-2022-10-20.ics" "Blue")  ; ICS source1
+;;     )))
 
 (setq lsp-clients-clangd-args '("-j=3"
                                 "--background-index"
@@ -130,3 +124,15 @@
                                 "--header-insertion-decorators=0"))
 
 (setq fancy-splash-image (concat doom-private-dir "splash.png"))
+
+
+(add-hook 'v-mode-hook #'lsp)
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration
+               '(v-mode . "v"))
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "/home/shaggy/Git/vls/bin/vls")
+                    :activation-fn (lsp-activate-on "v")
+                    :server-id 'v-ls)))
+
+(setq shell-file-name "/run/current-system/sw/bin/bash")
