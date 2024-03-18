@@ -85,6 +85,7 @@
                (direction . right)
                (window-width . 0.33)
                (window-height . fit-window-to-buffer)))
+
 (set-email-account!
  "hotmail"
  '((mu4e-sent-folder       . "/[Hotmail]/Sent")
@@ -93,6 +94,12 @@
    (mu4e-drafts-folder      . "/[Hotmail]/Drafts")
    (smtpmail-smtp-user     . "anton_christoffersson@hotmail.com"))
  t)
+(after! mu4e
+  (setq sendmail-program (executable-find "msmtp")
+        send-mail-function #'smtpmail-send-it
+        message-sendmail-f-is-evil t
+        message-sendmail-extra-arguments '("--read-envelope-from")
+        message-send-mail-function #'message-send-mail-with-sendmail))
 
 ;; (setq mu4e-get-mail-command "mbsync -c ~/.config/mu4e/mbsyncrc gmail hotmail"
 ;;       ;; get emails and index every 5 minutes
