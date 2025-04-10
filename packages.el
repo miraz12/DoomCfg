@@ -51,3 +51,8 @@
 (package! nyan-mode)
 
 (package! v-mode)
+
+(package! lsp-sonarlint
+  :recipe (:host github :repo "Horrih/lsp-sonarlint" :files ("lsp-sonarlint.el") ))
+
+(package! mu4e-alert)

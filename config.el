@@ -88,29 +88,51 @@
 
 (set-email-account!
  "hotmail"
- '((mu4e-sent-folder       . "/[Hotmail]/Sent")
-   (mu4e-trash-folder      . "/[Hotmail]/Junk")
-   (mu4e-refile-folder      . "/[Hotmail]/Inbox")
-   (mu4e-drafts-folder      . "/[Hotmail]/Drafts")
+ '((mu4e-sent-folder       . "~/.config/mail/[Hotmail]/Sent")
+   (mu4e-trash-folder      . "~/.config/mail/[Hotmail]/Junk")
+   (mu4e-refile-folder      . "~/.config/mail/[Hotmail]/Inbox")
+   (mu4e-drafts-folder      . "~/.config/mail/[Hotmail]/Drafts")
    (smtpmail-smtp-user     . "anton_christoffersson@hotmail.com"))
  t)
+
+(require 'mu4e-alert)
+(use-package mu4e-alert
+  :ensure t
+  :config
+  ;; Enable desktop notifications
+  (mu4e-alert-set-default-style 'notifications)
+  (mu4e-alert-enable-notifications)
+  (run-with-timer 0 300 'mu4e-alert-update-mail-count-modeline)
+
+  ;; Enable the mode-line indicator
+  (mu4e-alert-enable-mode-line-display)
+  
+  ;; Show unread emails count in the mode line
+  (setq mu4e-alert-interesting-mail-query
+        "flag:unread AND NOT flag:trashed"))
+
 (after! mu4e
-  (setq sendmail-program (executable-find "msmtp")
+  (setq sendmail-program (executable-find "msmtp" )
         send-mail-function #'smtpmail-send-it
         message-sendmail-f-is-evil t
         message-sendmail-extra-arguments '("--read-envelope-from")
-        message-send-mail-function #'message-send-mail-with-sendmail))
+        message-send-mail-function #'message-send-mail-with-sendmail
+        mu4e-update-interval 300
+        mu4e-headers-date-format "%d.%m.%y"
+        )
+  )
 
-;; (setq mu4e-get-mail-command "mbsync -c ~/.config/mu4e/mbsyncrc gmail hotmail"
-;;       ;; get emails and index every 5 minutes
-;;       mu4e-update-interval 300
-;;       ;; send emails with format=flowed
-;;       mu4e-compose-format-flowed t
-;;       ;; no need to run cleanup after indexing for gmail
-;;       mu4e-index-cleanup nil
-;;       mu4e-index-lazy-check t
-;;       ;; more sensible date format
-;;       mu4e-headers-date-format "%d.%m.%y")
+;; (setq mu4e-update-interval 300
+;;mu4e-get-mail-command "mbsync -c ~/.config/mu4e/mbsyncrc gmail hotmail"
+;; get emails and index every 5 minutes
+;; send emails with format=flowed
+;; mu4e-compose-format-flowed t
+;; no need to run cleanup after indexing for gmail
+;; mu4e-index-cleanup nil
+;; mu4e-index-lazy-check t
+;; more sensible date format
+
+
 
 ;; (defun my-open-calendar ()
 ;;   (interactive)
@@ -130,7 +152,7 @@
                                 "--header-insertion=never"
                                 "--header-insertion-decorators=0"))
 
-(setq fancy-splash-image (concat doom-private-dir "splash.png"))
+(setq fancy-splash-image (concat doom-user-dir "splash.png"))
 
 
 (add-hook 'v-mode-hook #'lsp)
