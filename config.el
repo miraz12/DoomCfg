@@ -86,53 +86,63 @@
                (window-width . 0.33)
                (window-height . fit-window-to-buffer)))
 
+;; Email account
 (set-email-account!
  "hotmail"
- '((mu4e-sent-folder       . "~/.config/mail/[Hotmail]/Sent")
-   (mu4e-trash-folder      . "~/.config/mail/[Hotmail]/Junk")
-   (mu4e-refile-folder      . "~/.config/mail/[Hotmail]/Inbox")
-   (mu4e-drafts-folder      . "~/.config/mail/[Hotmail]/Drafts")
-   (smtpmail-smtp-user     . "anton_christoffersson@hotmail.com"))
+ '((mu4e-sent-folder   . "/[Hotmail]/Sent")
+   (mu4e-trash-folder  . "/[Hotmail]/Deleted") 
+   (mu4e-refile-folder . "/[Hotmail]/Archive")
+   (mu4e-drafts-folder . "/[Hotmail]/Drafts")
+   (smtpmail-smtp-user . "anton_christoffersson@hotmail.com"))
  t)
 
-(require 'mu4e-alert)
-(use-package mu4e-alert
-  :ensure t
-  :config
-  ;; Enable desktop notifications
+(after! mu4e
+  (setq mu4e-root-maildir           "~/.config/mail"
+        mu4e-mu-home                "~/.cache/mu"
+        mu4e-update-interval        300
+        mu4e-get-mail-command       "mbsync -a"
+        mu4e-compose-format-flowed  t
+        mu4e-compose-switch         'window
+        mu4e-headers-date-format    "%d.%m.%y"
+        sendmail-program            (executable-find "msmtp")
+        send-mail-function          #'smtpmail-send-it
+        message-sendmail-f-is-evil  t
+        message-sendmail-extra-arguments '("--read-envelope-from")
+        message-send-mail-function  #'message-send-mail-with-sendmail))
+
+(when (daemonp)
+  (require 'mu4e)   
+  (mu4e t)) 
+
+
+
+;; mu4e-alert 
+(after! mu4e-alert
   (mu4e-alert-set-default-style 'notifications)
   (mu4e-alert-enable-notifications)
-  (run-with-timer 0 300 'mu4e-alert-update-mail-count-modeline)
-
-  ;; Enable the mode-line indicator
   (mu4e-alert-enable-mode-line-display)
-  
-  ;; Show unread emails count in the mode line
+  (run-with-timer 0 300 'mu4e-alert-update-mail-count-modeline)
   (setq mu4e-alert-interesting-mail-query
         "flag:unread AND NOT flag:trashed"))
 
-(after! mu4e
-  (setq sendmail-program (executable-find "msmtp" )
-        send-mail-function #'smtpmail-send-it
-        message-sendmail-f-is-evil t
-        message-sendmail-extra-arguments '("--read-envelope-from")
-        message-send-mail-function #'message-send-mail-with-sendmail
-        mu4e-update-interval 300
-        mu4e-headers-date-format "%d.%m.%y"
-        )
-  )
+;; Clangd LSP
+(after! lsp-clangd
+  (setq lsp-clients-clangd-args '("-j=3"
+                                  "--background-index"
+                                  "--clang-tidy"
+                                  "--completion-style=detailed"
+                                  "--header-insertion=never"
+                                  "--header-insertion-decorators=0")))
 
-(setq lsp-clients-clangd-args '("-j=3"
-                                "--background-index"
-                                "--clang-tidy"
-                                "--completion-style=detailed"
-                                "--header-insertion=never"
-                                "--header-insertion-decorators=0"))
+;; SonarLint
+;; (after! lsp-mode
+;;   (require 'lsp-sonarlint))
+
+(after! lsp-mode
+  (setq lsp-glslls-executable '("glslls" "--target-env" "opengl")))
 
 (setq fancy-splash-image (concat doom-user-dir "splash.png"))
+(setq shell-file-name (executable-find "bash")) 
 
-(setq shell-file-name "/run/current-system/sw/bin/bash")
-
-(setq projectile-enable-cmake-presets 1)
-
-(require 'lsp-sonarlint)
+(setq-default vterm-shell               "/run/current-system/sw/bin/fish"
+              explicit-shell-file-name  "/run/current-system/sw/bin/fish")
